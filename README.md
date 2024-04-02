@@ -1,7 +1,7 @@
 # Design Thinking Project Title  
 Modelling Food Safety and Food Security using Excel and Python Language Programming
 
-# Design thinking Project Scenario
+# Design Thinking Project Scenario
 The world will need to feed 9 billion people by 2050 _(Godfray et. al 2010)_, and to do so through safe, sustainable food chains. Access by all – especially the poor and vulnerable – to safe, nutritious, and sufficient food is an issue of increasing urgency and a key Sustainable Development Goal _(Goal 2: Zero Hunger)_. How can a humanistic approach to data-driven modelling help to solve some of the challenges related to food security and safety? 
 
 ## Defining Food Safety and Food Security
