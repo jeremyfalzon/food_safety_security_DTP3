@@ -6,3 +6,14 @@ The world will need to feed 9 billion people by 2050 _(Godfray et. al 2010)_, an
 
 ## Defining Food Safety and Food Security
 Food security refers to the adequate supply of safe and nutritious food for all to lead healthy and active lives. Food safety, in general, refers to the handling, preparation and storage of food to prevent illness and injury. In this sense, food safety is an important component of food security. The problems of food safety and food security are interrelated _(Hanning et. al. 2012)_. Without food safety systems to assure access to food without pathogens and contaminants, food security is diminished. The factors relating to climate change, political governance, geopolitical and cultural conflicts, technological advancements (or lack thereof), biodiversity loss, agricultural practices, migration movements, sanitation, are just some of the many multidimensional issues that impact both food safety and security _(King et. al. 2017)_
+
+## Web app
+
+The analysis is also presented as a small web app: a FastAPI service in `server/` fits the multiple linear regression from `DDW data.csv`, and the static frontend in `web/` shows the interactive predictor, model metrics, coefficients and country table.
+
+```bash
+pip install -r requirements.txt
+uvicorn server.main:app --reload
+```
+
+Then open http://localhost:8000. API routes: `GET /api/model`, `POST /api/predict`, `GET /api/health`.

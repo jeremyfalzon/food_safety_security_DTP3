@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from .model import FEATURES, get_model
+from .model import get_model
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 WEB_DIR = BASE_DIR / "web"
@@ -33,11 +33,7 @@ def model_snapshot() -> dict:
 
 @app.post("/api/predict")
 def predict(payload: PredictRequest) -> dict:
-    values = payload.model_dump()
-    for feature in FEATURES:
-        if feature.key not in values:
-            raise ValueError(f"Missing indicator: {feature.key}")
-    return {"prediction": round(get_model().predict(values), 1)}
+    return {"prediction": round(get_model().predict(payload.model_dump()), 1)}
 
 
 app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
