@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Food Safety &amp; Security — Undernourishment Model</title>
+  <meta name="description" content="A multiple linear regression model estimating the prevalence of undernourishment from income, political stability, sanitation and clean cooking access.">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 28V13" />
+        <path d="M16 17c0-5 3.5-9 9-9 0 5-3.5 9-9 9Z" />
+        <path d="M16 21c0-4.5-3-8-8-8 0 4.5 3 8 8 8Z" />
+      </svg>
+      <span class="brand-text">
+        <strong>Food Safety &amp; Security</strong>
+        <small>Undernourishment model</small>
+      </span>
+    </a>
+    <nav class="site-nav" aria-label="Sections">
+      <a href="#predict">Predict</a>
+      <a href="#model">Model</a>
+      <a href="#data">Data</a>
+      <a href="#method">Method</a>
+    </nav>
+    <span class="sdg-chip">SDG 2 · Zero Hunger</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Design thinking project · Data-driven modelling</p>
+      <h1>What drives hunger in a country?</h1>
+      <p class="lead">
+        A multiple linear regression model that estimates the
+        <strong>prevalence of undernourishment</strong> from income, political
+        stability, sanitation and clean cooking access — trained on World Bank
+        and FAO data for 39 countries.
+      </p>
+      <ul class="hero-stats">
+        <li>
+          <strong id="stat-countries">39</strong>
+          <span>countries in the sample</span>
+        </li>
+        <li>
+          <strong id="stat-adjr2">—</strong>
+          <span>adjusted R² on holdout</span>
+        </li>
+        <li>
+          <strong>4</strong>
+          <span>socio-economic indicators</span>
+        </li>
+      </ul>
+    </section>
+
+    <section id="predict" class="section">
+      <div class="section-head">
+        <p class="eyebrow">Interactive model</p>
+        <h2>Estimate undernourishment</h2>
+        <p>
+          Move the indicators, or start from a country in the dataset, to see
+          the share of the population the model expects to be undernourished.
+        </p>
+      </div>
+
+      <div class="predict-grid">
+        <form class="card controls" id="predict-form" autocomplete="off">
+          <div class="preset-row">
+            <label for="country-preset">Start from a country</label>
+            <select id="country-preset">
+              <option value="">Custom values</option>
+            </select>
+          </div>
+
+          <div id="feature-controls"></div>
+
+          <div class="controls-foot">
+            <button type="button" class="btn ghost" id="reset-btn">Reset to sample average</button>
+          </div>
+        </form>
+
+        <aside class="card result" aria-live="polite">
+          <p class="result-label">Estimated prevalence of undernourishment</p>
+          <p class="result-value">
+            <span id="prediction">—</span><span class="result-unit">%</span>
+          </p>
+
+          <div class="gauge">
+            <div class="gauge-track">
+              <span class="gauge-fill" id="gauge-fill"></span>
+            </div>
+            <span class="gauge-marker" id="gauge-marker"></span>
+            <div class="gauge-scale" aria-hidden="true">
+              <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+            </div>
+          </div>
+
+          <p class="result-band">
+            <span class="band-chip" id="band-chip">—</span>
+            <span id="result-share"></span>
+          </p>
+          <p class="result-note" id="result-note"></p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="model" class="section">
+      <div class="section-head">
+        <p class="eyebrow">Model performance</p>
+        <h2>How well does it fit?</h2>
+        <p>
+          The model is trained on 70% of the sample and scored on the remaining
+          30%. Adjusted R² is used because plain R² always rises when more
+          predictors are added.
+        </p>
+      </div>
+
+      <div class="metric-grid">
+        <article class="card metric">
+          <p class="metric-label">Adjusted R²</p>
+          <p class="metric-value" id="metric-adjr2">—</p>
+          <p class="metric-note" id="metric-adjr2-note">Holdout set</p>
+        </article>
+        <article class="card metric">
+          <p class="metric-label">R²</p>
+          <p class="metric-value" id="metric-r2">—</p>
+          <p class="metric-note">Share of variance explained</p>
+        </article>
+        <article class="card metric">
+          <p class="metric-label">RMSE</p>
+          <p class="metric-value" id="metric-rmse">—</p>
+          <p class="metric-note">Percentage points, holdout</p>
+        </article>
+      </div>
+
+      <article class="card coefficients">
+        <header class="coefficients-head">
+          <div>
+            <h3>What moves the estimate</h3>
+            <p>
+              Standardised coefficients: the change in predicted undernourishment
+              for a one-standard-deviation increase in each indicator, holding
+              the others constant.
+            </p>
+          </div>
+          <ul class="legend">
+            <li><span class="swatch swatch-down"></span>Lowers hunger</li>
+            <li><span class="swatch swatch-up"></span>Raises hunger</li>
+          </ul>
+        </header>
+        <ul class="coef-list" id="coef-list"></ul>
+      </article>
+    </section>
+
+    <section id="data" class="section">
+      <div class="section-head">
+        <p class="eyebrow">Dataset</p>
+        <h2>39 countries, side by side</h2>
+        <p>
+          Observed undernourishment against the model's estimate for every
+          country in the sample.
+        </p>
+      </div>
+
+      <div class="table-toolbar">
+        <label class="search">
+          <span class="sr-only">Search countries</span>
+          <input id="country-search" type="search" placeholder="Search countries…">
+        </label>
+        <p class="table-meta" id="table-meta">—</p>
+      </div>
+
+      <div class="table-wrap">
+        <table id="country-table">
+          <caption class="sr-only">Indicators, observed undernourishment and model estimates by country</caption>
+          <thead>
+            <tr>
+              <th scope="col">Country</th>
+              <th scope="col" class="num">GDP / capita</th>
+              <th scope="col" class="num">Stability</th>
+              <th scope="col" class="num">Sanitation</th>
+              <th scope="col" class="num">Clean fuels</th>
+              <th scope="col" class="num">Actual PoU</th>
+              <th scope="col" class="num">Predicted PoU</th>
+            </tr>
+          </thead>
+          <tbody id="country-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="method" class="section">
+      <div class="section-head">
+        <p class="eyebrow">Method</p>
+        <h2>How the model was built</h2>
+      </div>
+
+      <div class="method-grid">
+        <article class="card method">
+          <h3>Data</h3>
+          <p>
+            Indicators come from the World Bank DataBank and the FAO's cost of a
+            healthy diet and food security datasets. The sample covers 39
+            countries with no missing values in the modelled fields.
+          </p>
+        </article>
+        <article class="card method">
+          <h3>Model</h3>
+          <p>
+            A multiple linear regression fitted with batch gradient descent
+            (1,500 iterations, learning rate 0.01) on z-scored features. The
+            target is the prevalence of undernourishment, in percent of the
+            population.
+          </p>
+        </article>
+        <article class="card method">
+          <h3>Evaluation</h3>
+          <p>
+            A 70/30 train–test split, repeated from the original notebook with
+            seed 9022. Adjusted R² and RMSE are reported on the holdout
+            countries, not on the data used to fit the coefficients.
+          </p>
+        </article>
+      </div>
+
+      <p class="caveat">
+        <strong>A note on interpretation.</strong> This is a small,
+        cross-sectional sample, and the indicators are strongly correlated with
+        one another — which is why some coefficients carry unexpected signs, as
+        the original analysis also notes. The coefficients describe associations
+        in these 39 countries, not causal effects, and estimates for countries
+        far outside the observed ranges are extrapolations. Treat the output as
+        an illustration of the modelling approach rather than an official hunger
+        statistic.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Built from <span class="mono">Results.ipynb</span> and <span class="mono">DDW data.csv</span> · Multiple linear regression on World Bank and FAO indicators.</p>
+    <p>SDG 2 · Zero Hunger</p>
+  </footer>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
